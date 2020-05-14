@@ -1,3 +1,25 @@
+### WebDSL / IceDust ###
+
+# config
+application.ini
+
+# generated
+icedust.app
+lib/icedust
+nativejava
+stylesheets/
+javascript/
+
+# dotfiles
+.saved-but-not-built
+.dependencies.webdsl
+.webdsl-fragment-cache
+.webdsl-parsecache
+.servletapp
+.cache
+
+# database
+*.db
 
 # Created by https://www.gitignore.io/api/eclipse
 # Edit at https://www.gitignore.io/?templates=eclipse
