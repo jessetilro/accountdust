@@ -50,38 +50,66 @@ page root {
 	            output(account.getNetCredit())
 	          </td>
 	          <td>
-	            if (account.getAuxiliary()) {
-	              output(account.getNetDebit())
-	            }
+              output(account.getAuxiliaryDebit())
 	          </td>
 	          <td>
-              if (account.getAuxiliary()) {
-                output(account.getNetCredit())
-              }
+              output(account.getAuxiliaryCredit())
 	          </td>
 	          <td>
-	           if (!account.getAuxiliary()) {
-	             output(account.getFinalDebit())
-	           }
+             output(account.getFinalDebit())
 	          </td>
 	          <td>
-	           if (!account.getAuxiliary()) {
-	             output(account.getFinalCredit())
-	           }
+             output(account.getFinalCredit())
 	          </td>
 	        </tr>
 	      }  
-	      <tr>
-	        <td colspan="6">
-	        </td>
-	        <td>
-					 <strong>
-					   output(ledger.getNetIncome())
-					 </strong>
-	        </td>
-	        <td cospan="3">
-	        </td>
-	      </tr>
+	      
+	      <tfoot>
+		      <tr>
+						<td>
+						</td>
+						<td>
+						 text("Nettoresultaat")
+	          </td>
+						<td colspan="4">
+						</td>
+						<td>
+						 <strong>
+						   output(ledger.getNetIncome())
+						 </strong>
+						</td>
+						<td cospan="3">
+						</td>
+		      </tr>
+		      <tr>
+		        <td colspan="2">
+		        </td>
+            <td>
+              output(ledger.getDebit())
+            </td>
+            <td>
+              output(ledger.getCredit())
+            </td>
+            <td>
+              output(ledger.getNetDebit())
+            </td>
+            <td>
+              output(ledger.getNetCredit())
+            </td>
+            <td>
+              output(ledger.getAuxiliaryCredit())
+            </td>
+            <td>
+              output(ledger.getAuxiliaryCredit())
+            </td>
+            <td>
+              output(ledger.getFinalDebit())
+            </td>
+            <td>
+              output(ledger.getFinalCredit())
+            </td>
+          </tr>
+	      </tfoot>
       </tbody>
     }
   }
