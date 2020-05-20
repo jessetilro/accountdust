@@ -3,9 +3,10 @@ module icedust // ctree collection=?+-2s constraints=0.025s analysis2=0.25s // j
 model
 
   entity Ledger {
-    debit : Float = sum(accounts.net_debit) <+ 0.0 (incremental)
-    credit : Float = sum(accounts.net_credit) <+ 0.0 (incremental)
+    debit : Float = sum(accounts.netDebit) <+ 0.0 (incremental)
+    credit : Float = sum(accounts.netCredit) <+ 0.0 (incremental)
     balanced : Boolean = sum(accounts.credit) == sum(accounts.debit)
+    netIncome : Float = sum(revenues.balance) - sum(expenses.balance)
   }
   
   entity Category {
@@ -18,13 +19,15 @@ model
   relation Account.category ? <-> * Category.accounts
 
   entity Account {
-    type : String = "asset" (default)
+    type : String = "asset/fixed" (default)
+    auxiliary : Boolean = (type == "auxiliary/revenue" or type == "auxiliary/expense") 
     side : String =
       switch {
-        case type == "asset" => "debit"
+        case type == "asset/fixed" => "debit"
+        case type == "asset/current" => "debit"
         case type == "auxiliary/expense" => "debit"
         case type == "liability/equity" => "credit"
-        case type == "liability" => "credit"
+        case type == "liability/debt" => "credit"
         case type == "auxiliary/revenue" => "credit"
         default => "credit"
       }
@@ -32,17 +35,17 @@ model
     number : Int = 0 (default)
     debit : Float = sum(mutations.debit) <+ 0.0
     credit : Float = sum(mutations.credit) <+ 0.0
-    net_debit : Float = if (debit > credit) debit - credit else 0.0 (incremental)
-    net_credit : Float = if (credit > debit) credit - debit else 0.0 (incremental)
+    netDebit : Float = if (debit > credit) debit - credit else 0.0
+    netCredit : Float = if (credit > debit) credit - debit else 0.0
+    finalDebit : Float = netDebit
+    finalCredit : Float = netCredit + (if (type == "liability/equity") ledger.netIncome else 0.0)
     balance : Float = if (side == "credit") credit - debit else debit - credit
   }
   
   relation Ledger.accounts * <-> 1 Account.ledger
-  relation Ledger.assets * = accounts.filter(x => x.type == "asset") <-> ? Account.ledger_as_asset
-  relation Ledger.equities * = accounts.filter(x => x.type == "equity") <-> ? Account.ledger_as_equity
-  relation Ledger.liabilities * = accounts.filter(x => x.type == "liability") <-> ? Account.ledger_as_liability
-  relation Ledger.revenues * = accounts.filter(x => x.type == "revenue") <-> ? Account.ledger_as_revenue
-  relation Ledger.expenses * = accounts.filter(x => x.type == "expense") <-> ? Account.ledger_as_expense
+  relation Ledger.auxiliaries * = accounts.filter(x => x.auxiliary) <-> ? Account.ledger_as_auxiliary
+  relation Ledger.revenues * = accounts.filter(x => x.type == "auxiliary/revenue") <-> ? Account.ledger_as_revenue
+  relation Ledger.expenses * = accounts.filter(x => x.type == "auxiliary/expense") <-> ? Account.ledger_as_expense
   
   entity Journal {
     balanced : Boolean = conj(entries.balanced)
@@ -115,60 +118,60 @@ data
     accounts =
       r1: Account {
         number = 1
-        type = "asset"
+        type = "asset/current"
         name = "Voorraad"
       },
       r2: Account {
         number = 2
-        type = "asset"
+        type = "asset/current"
         name = "Debiteuren"
       },
       r3: Account {
         number = 3
-        type = "asset"
+        type = "asset/current"
         name = "Bank"
       },
       r4: Account {
         number = 4
-        type = "asset"
+        type = "asset/current"
         name = "Register"
       },
       
       r5: Account {
         number = 5
-        type = "equity"
+        type = "liability/equity"
         name = "Eigen vermogen"
       },
       
       r6: Account {
         number = 6
-        type = "liability"
+        type = "liability/debt"
         name = "Crediteuren"
       },
       
       r7: Account {
         number = 7
-        type = "revenue"
+        type = "auxiliary/revenue"
         name = "Opbrengst verkopen"
       },
       r8: Account {
         number = 8
-        type = "xpense"
+        type = "auxiliary/expense"
         name = "Inkoopprijs verkopen"
       },
       r9: Account {
         number = 9
-        type = "expense"
+        type = "auxiliary/expense"
         name = "Huurkosten"
       },
       r10: Account {
         number = 10
-        type = "expense"
+        type = "auxiliary/expense"
         name = "Loonkosten"
       },
       r11: Account {
         number = 11
-        type = "expense"
+        type = "auxiliary/expense"
         name = "Overige kosten"
       }
   }

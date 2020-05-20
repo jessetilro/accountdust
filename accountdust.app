@@ -28,32 +28,61 @@ page root {
         </tr>
       </thead>
      
-      for (account : Account in ledger.getAccounts()) {
-        <tr>
-          <td>
-            output(account.number)
-          </td>
-          <td>
-            output(account.name)
-          </td>
-          <td>
-	          output(account.getDebit())
+      <tbody>
+	      for (account : Account in ledger.getAccounts()) {
+	        <tr>
+	          <td>
+	            output(account.number)
+	          </td>
+	          <td>
+	            output(account.name)
+	          </td>
+	          <td>
+		          output(account.getDebit())
+		        </td>
+	          <td>
+	            output(account.getCredit())
+	          </td>
+	          <td>
+	            output(account.getNetDebit())
+	          </td>
+	          <td>
+	            output(account.getNetCredit())
+	          </td>
+	          <td>
+	            if (account.getAuxiliary()) {
+	              output(account.getNetDebit())
+	            }
+	          </td>
+	          <td>
+              if (account.getAuxiliary()) {
+                output(account.getNetCredit())
+              }
+	          </td>
+	          <td>
+	           if (!account.getAuxiliary()) {
+	             output(account.getFinalDebit())
+	           }
+	          </td>
+	          <td>
+	           if (!account.getAuxiliary()) {
+	             output(account.getFinalCredit())
+	           }
+	          </td>
+	        </tr>
+	      }  
+	      <tr>
+	        <td colspan="6">
 	        </td>
-          <td>
-            output(account.getCredit())
-          </td>
-          <td>
-            output(account.getNet_debit())
-          </td>
-          <td>
-            output(account.getNet_credit())
-          </td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      }  
+	        <td>
+					 <strong>
+					   output(ledger.getNetIncome())
+					 </strong>
+	        </td>
+	        <td cospan="3">
+	        </td>
+	      </tr>
+      </tbody>
     }
   }
   
