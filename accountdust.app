@@ -2,6 +2,10 @@ application accountdust
 imports icedust
 imports layout
 
+extend entity Entry { 
+  validate(description.length() > 0, "Description cannot be empty") 
+} 
+
 template balance(ledger: Ledger) {
   <table class="table table-sm">
     <thead>
@@ -138,9 +142,10 @@ template entriesTable(entries: List<Entry>) {
   }
 }
 
-template mutationsTable(mutations: List<Mutation>) {
+template mutationsTable(mutations: List<Mutation>, ph: Placeholder) {
   table[class="table table-sm"] {
     for (mutation: Mutation in mutations) {
+      
       <tr>
         <td>
           output(mutation.getAccount().getName())
@@ -152,11 +157,12 @@ template mutationsTable(mutations: List<Mutation>) {
           output(mutation.getCredit())
         </td>
         <td>
-          action("Delete", action {
+          submitlink action {
             var entry := mutation.getEntry();
+            entry.mutations.remove(mutation);
             mutation.delete();
-            return editEntry(entry);
-          })
+            replace(ph);
+          }{ "Delete" }
         </td>
       </tr>
     }
@@ -186,7 +192,17 @@ page entries {
         for (journal: Journal) {
           entriesTable(journal.getEntries())
           
-          navigate createEntry(journal) { "Feit toevoegen" }  
+          submitlink action {
+				    var entry := Entry{
+				      journal := journal
+				      date := today()
+				      description := "New entry"
+				    }.save();
+				    return editEntry(entry);
+				  }[class="btn btn-sm btn-success"]{
+				    <i class="fa fas fa-plus"></i>
+				    " Add entry"
+			    }
         }
       }
     }
@@ -220,17 +236,67 @@ page editEntry(entry: Entry) {
   
   clean {
     pane("Feit") {
-      label("Omschrijving") { output(entry.description) }
-      
-      mutationsTable(entry.getMutations())
-      
-      
-      navigate entries()[class="btn btn-secondary btn-lg"] {
-        "Terug"
-      }
-      navigate createMutation(entry)[class="btn btn-success btn-lg"] {
-        <i class="fa fas fa-plus"></i>
-        "Boeking toevoegen"
+      placeholder ph {
+	      form {
+		      label("Omschrijving") { input(entry.description) }
+		      
+		      //mutationsTable(entry.getMutations(), ph)
+		      table[class="table table-sm mt-3"] {
+				    for (mutation: Mutation in entry.mutations) {
+				      <tr>
+				        <td>
+				          input(mutation.account)
+				        </td>
+				        <td>
+				          input(mutation.debit)
+				        </td>
+				        <td>
+				          input(mutation.credit)
+				        </td>
+				        <td>
+				          submitlink action {
+				            entry.mutations.remove(mutation);
+				            mutation.account.mutations.remove(mutation);
+				            mutation.delete();
+				            replace(ph);
+				          }[class="btn btn-sm btn-default"]{
+				            <i class="fa fas fa-trash"></i>
+				            " Delete"
+			            }
+				        </td>
+				      </tr>
+				    }
+				  }
+				  
+				  div[class="mb-3"] {
+				  	submitlink action {
+				  		var account : Account := (from Account limit 1)[0];
+	            entry.mutations.add(Mutation{
+	              credit := 0.0
+	              debit := 0.0
+	              account := account
+	            });
+	            replace(ph);
+	          }[class="btn btn-default btn-sm"]{
+	            <i class="fa fas fa-plus"></i>
+	            " Add mutation"  
+	          }
+				  }
+		      
+		      div[class="mt-3"] {
+		      	navigate entries()[class="btn btn-light btn-lg mr-3"] {
+	            <i class="fa fas fa-times"></i>
+	            " Cancel"
+	          }
+	          submitlink action{
+	            entry.save();
+	            return entries();
+	          }[class="btn btn-primary btn-lg"]{
+	            <i class="fa fas fa-save"></i>
+	            " Save"
+	          }
+		      }
+	      }
       }
     }
   }
@@ -271,3 +337,4 @@ entity User {
 principal is User with credentials name, pass
 access control rules
 rule page *(*){true}
+rule logsql { true }
