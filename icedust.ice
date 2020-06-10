@@ -89,14 +89,14 @@ model
   relation Journal.entries * <-> 1 Entry.journal
   
   entity Mutation {
-    date : Datetime = entry.date
+    date : Datetime? = entry.date
     debit : Float = 0.0 (default)
     credit : Float = 0.0 (default)
   }
   
-  relation Mutation.account 1 <-> * Account.mutations
-  relation Mutation.entry 1 <-> + Entry.mutations 
-  relation Mutation.journal 1 =
+  relation Mutation.account ? <-> * Account.mutations
+  relation Mutation.entry ? <-> + Entry.mutations 
+  relation Mutation.journal ? =
     entry.journal <-> * Journal.mutations
 
 data
