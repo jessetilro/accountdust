@@ -236,8 +236,8 @@ page editEntry(entry: Entry) {
   
   clean {
     pane("Feit") {
-      placeholder ph {
-	      form {
+      form {
+        placeholder ph {
 		      label("Omschrijving") { input(entry.description) }
 		      
 		      //mutationsTable(entry.getMutations(), ph)
