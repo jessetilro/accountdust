@@ -7,7 +7,7 @@ application.ini
 icedust.app
 lib/icedust
 nativejava
-stylesheets/
+stylesheets/icedust.css
 javascript/
 
 # dotfiles

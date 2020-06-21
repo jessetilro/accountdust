@@ -1,0 +1,68 @@
+.pane {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.25);
+}
+
+.pane > hr {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.pane__bar {
+  background-color: rgba(0,0,0,.05);
+}
+
+.pane__body {
+  // Enable `flex-grow: 1` for decks and groups so that card blocks take up
+  // as much space as possible, ensuring footers are aligned to the bottom.
+  flex: 1 1 auto;
+  // Workaround for the image size bug in IE
+  // See: https://github.com/twbs/bootstrap/pull/28855
+  min-height: 1px;
+  padding: 1.25rem;
+}
+
+.pane__button {
+  border-top: 1px solid rgba(0,0,0,.05);
+  padding: .75rem 1.25rem;
+  font-family: 'Open Sans';
+  font-weight: bold;
+  font-size: .9rem;
+  position: relative;
+  text-decoration: none;
+  cursor: pointer;
+  background: linear-gradient(to right, rgba(0,0,0,.05) 50%, #ffffff 50%);
+  background-position: right;
+  background-size: 200% 100%;
+  color: #6c757d;
+  transition: background-position .2s, color .2s;
+}
+.pane__button:hover {
+  text-decoration: none;
+  background-position: left;
+  color: #000;
+}
+.pane__button-icon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 32px;
+  width: 32px;
+  display: inline-block;
+  text-align: center;
+  line-height: 32px;
+  vertical-align: middle;
+  color: rgba(0,0,0,.2);
+  font-size: 18px;
+  transition: color .2s;
+}
+.pane__button:hover .pane__button-icon {
+  color: #6c757d;
+}

@@ -1,0 +1,39 @@
+.content {
+  padding: 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.content--padded {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.content--narrow {
+  max-width: 1140px;
+}
+
+@media (max-width: 576px) {
+  .content--padded {
+    padding: 0;
+  }
+  .content--narrow {
+    max-width: 100%;
+  }
+
+  .content > .row {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .content > .row > .col,
+  .content > .row > [class*="col-"] {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}

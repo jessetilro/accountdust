@@ -1,0 +1,59 @@
+.page-container {
+  min-height: 100%;
+  height: 100vh;
+  display: flex;
+}
+.page-container__primary {
+  flex: 0 0 64px;
+  transition: flex .25s;
+  z-index: 20;
+}
+.page-container__primary:not(.closed):hover {
+  flex: 0 0 200px;
+}
+
+.page-container__secondary {
+  flex: 0 0 0;
+  transition: flex .25s;
+  z-index: 15;
+}
+.page-container__secondary.open {
+  flex: 0 0 220px;
+}
+
+.page-container__main {
+  flex: 1;
+  max-width: 100%;
+}
+
+@media (max-width: 576px) {
+  .page-container {
+    display: flex;
+    height: initial;
+  }
+
+  .page-container__primary,
+  .page-container__primary:hover {
+    display: block;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    flex: initial;
+  }
+
+  .page-container__secondary {
+    display: block;
+    position: fixed;
+    width: 0;
+    top: 0;
+    left: 0;
+    flex: initial;
+  }
+
+  .page-container__main {
+    flex: initial;
+    padding-top: 55px;
+    padding-bottom: 10px;
+  }
+}
