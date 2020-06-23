@@ -98,6 +98,43 @@ model
   relation Mutation.entry ? <-> + Entry.mutations 
   relation Mutation.journal ? =
     entry.journal <-> * Journal.mutations
+    
+  // https://download.belastingdienst.nl/belastingdienst/docs/handboek-loonheffingen-jan-2020-lh0221t01fd.pdf
+  entity Salary {
+  	description : String = "Unnamed Salary" (default)
+  	grossMonthSalary : Float = 0.0 (default)
+  	applyZvwEmployerCharge : Boolean = true (default)
+  	collectZvwContribution : Boolean = false (default)
+  	
+  	grossYearSalary : Float = 12.0 * grossMonthSalary
+  	
+  	incomeForTax : Float = grossYearSalary
+  	incomeForZvw : Float = min(grossYearSalary ++ 57232.0)
+  	
+  	taxBracket : Float = 68507.0
+  	incomeBracket1 : Float = min(incomeForTax ++ taxBracket)
+    incomeBracket2 : Float = max(incomeForTax ++ taxBracket) - taxBracket
+    // income tax includes payroll tax + national insurance premiums 
+    incomeTax : Float = (37.35 / 100.0) * incomeBracket1 + (49.50 / 100.0) * incomeBracket2
+    incomeTaxDiscount : Float = 0.0 // TODO
+    
+    zvwContribution : Float = if (collectZvwContribution) (5.45 / 100.0) * incomeForZvw else 0.0
+    zvwEmployerCharge : Float = if (applyZvwEmployerCharge) (6.70 / 100.0) * incomeForZvw else 0.0
+    
+    collections : Float = incomeTax - incomeTaxDiscount + zvwContribution
+    charges : Float = zvwEmployerCharge
+    netYearSalary : Float = grossYearSalary - collections
+  }
+  
+  entity PersonnelCosts {
+  	grossSalaries : Float = sum(salaries.grossMonthSalary)
+  	charges : Float = sum(salaries.charges)
+  	collections : Float = sum(salaries.collections)
+  	costs : Float = grossSalaries + charges
+  	payments : Float = sum(salaries.netYearSalary)
+  }
+  
+  relation Salary.personnelCosts ? <-> * PersonnelCosts.salaries
 
 data
 
@@ -151,8 +188,8 @@ data
         type = "asset/current"
         name = "Debiteuren"
       },
-      r3: Account {
-        number = 3
+      r120: Account {
+        number = 120
         type = "asset/current"
         name = "Bank"
       },
@@ -172,6 +209,11 @@ data
         number = 6
         type = "liability/debt"
         name = "Crediteuren"
+      },
+      r150: Account {
+        number = 150
+        type = "liability/debt"
+        name = "Af te dragen loonheffingen"
       },
       
       r7: Account {
@@ -198,6 +240,16 @@ data
         number = 11
         type = "auxiliary/expense"
         name = "Overige kosten"
+      },
+      r410: Account {
+        number = 410
+        type = "auxiliary/expense"
+        name = "Loonkosten"
+      },
+      r412: Account {
+        number = 412
+        type = "auxiliary/expense"
+        name = "Sociale lasten"
       }
   }
   
@@ -219,7 +271,7 @@ data
             credit = 23000.0
           },
           m3: Mutation {
-            account = r3
+            account = r150
             debit = 39000.0
             credit = 32700.0
           },
@@ -264,6 +316,19 @@ data
             credit = no value
           }
       }
+  }
+  
+  salary1: Salary {
+  	description = "Aedan Petersen (CEO)"
+  	grossMonthSalary = 10000.0
+  }
+  salary2: Salary {
+  	description = "Jazmine Vang (HR Manager)"
+  	grossMonthSalary = 3500.0
+  }
+  salary3: Salary {
+  	description = "Rayan Garner (Janitor)"
+  	grossMonthSalary = 2500.0
   }
 
 execute

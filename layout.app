@@ -38,6 +38,11 @@ template pageContainer() {
             "Journaal"
           </span>
         }
+        navigate salaries()[class="primary-menu__link"] {
+          <i class="fa fas fa-users"></i><span class="primary-menu__link-text">
+            "Salaries"
+          </span>
+        }
       </div>
     </div>
     <div class="page-container__secondary">

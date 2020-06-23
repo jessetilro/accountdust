@@ -1,1 +1,1 @@
-cp -r ../../icedust-workspace/AccountDust/* ./
+cp -r ~/icedust-workspace/accountdust/* ./
